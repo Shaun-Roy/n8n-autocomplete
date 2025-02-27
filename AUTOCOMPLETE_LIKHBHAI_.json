@@ -1,0 +1,119 @@
+{
+  "name": "AUTOCOMPLETE(LIKHBHAI)",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an autocomplete system that predicts the next words or completes partial words based on user input. Your task is to provide exactly 5 predictions in a structured format. Follow these rules:\n\nIf the input is a complete word or phrase, predict the next most likely words.\nIf the input is an incomplete word, suggest possible full words.\nMaintain grammatical correctness and contextual relevance.\nOutput exactly 5 suggestions as a JSON array.\nDo not include any additional text, explanations, or formatting—only the JSON output.\n\nData to use:\n{{ $json.body.query }}\n\n\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        0
+      ],
+      "id": "8dbdea59-80fb-4262-8c7c-d930a672e374",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "mistralai/mistral-7b-instruct:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        260,
+        220
+      ],
+      "id": "22bc0ec2-8ce0-496a-97bf-910548ce11bd",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "rQKt75jcsmMzrcgw",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        580,
+        0
+      ],
+      "id": "6013521e-4ae9-4d81-aec5-dd7d945def66",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "b548cdf2-d85c-4993-b90f-d0943e3344b2",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        0
+      ],
+      "id": "96b09631-535e-4492-8d08-13e9509c7ac1",
+      "name": "Webhook",
+      "webhookId": "b548cdf2-d85c-4993-b90f-d0943e3344b2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cf9e4426-a550-4bf8-b5b7-07a26adb720a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "74fc44fdb8042e224bb8bbb96845662f52f4f8212cf3796eeb436b65f52f2013"
+  },
+  "id": "CPhHJ6OyLXKO1ESd",
+  "tags": []
+}
